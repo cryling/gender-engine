@@ -19,3 +19,13 @@
 
 # Go workspace file
 go.work
+
+# any env files
+*.env
+
+.
+/tmp
+*.csv
+
+# mac hidden files
+.DS_Store

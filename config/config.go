@@ -18,8 +18,13 @@ func Initialize(env string) {
 		panic(err)
 	}
 
+	redisURL, exists := os.LookupEnv("REDIS_URL")
+	if !exists {
+		panic("REDIS_URL is not set")
+	}
+
 	appConfig = AppConfig{
-		REDIS_URL: os.Getenv("REDIS_URL"),
+		REDIS_URL: redisURL,
 	}
 }
 

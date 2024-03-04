@@ -2,7 +2,6 @@ package infrastructure
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 
 	"github.com/cryling/gender-engine/domain"
@@ -24,7 +23,6 @@ func (handler *SQLiteHandler) FindByName(name string) (*domain.GenderLabel, erro
 
 	var err error
 
-	fmt.Println(row)
 	if err = row.Scan(&label.Name, &label.Gender); err == sql.ErrNoRows {
 		log.Printf("Name not found")
 		return &domain.GenderLabel{}, err

@@ -1,19 +1,25 @@
 package infrastructure
 
-import "github.com/cryling/gender-engine/domain"
+import (
+	"log"
+	"strings"
+
+	"github.com/cryling/gender-engine/domain"
+)
 
 type MemoryHandler struct {
 	storage map[string]string
 }
 
-func NewMemoryHandler() MemoryHandler {
-	return MemoryHandler{storage: make(map[string]string)}
+func NewMemoryHandler(data map[string]string) MemoryHandler {
+	return MemoryHandler{storage: data}
 }
 
 func (handler MemoryHandler) FindByName(name string) (*domain.GenderLabel, error) {
-	result, err := handler.storage[name]
-	if err {
-		return &domain.GenderLabel{}, nil
+	result, ok := handler.storage[strings.ToLower(name)]
+	if !ok {
+		log.Printf("Name not found")
+		return &domain.GenderLabel{}, &domain.NotFoundError{Name: name}
 	}
 
 	return &domain.GenderLabel{Name: name, Gender: result}, nil

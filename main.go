@@ -10,6 +10,7 @@ import (
 	"github.com/cryling/gender-engine/config"
 	"github.com/cryling/gender-engine/domain"
 	"github.com/cryling/gender-engine/infrastructure"
+	"github.com/cryling/gender-engine/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,6 +30,8 @@ func main() {
 	log.Println("Initialized")
 
 	r := gin.Default()
+	r.ForwardedByClientIP = true
+	r.Use(middleware.RateLimitMiddleware())
 
 	r.GET("/api/v1/sqlite_gender", func(c *gin.Context) {
 		name := c.Query("name")

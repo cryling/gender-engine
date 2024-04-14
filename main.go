@@ -2,12 +2,10 @@ package main
 
 import (
 	"database/sql"
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
 
-	"github.com/cryling/gender-engine/config"
 	"github.com/cryling/gender-engine/domain"
 	"github.com/cryling/gender-engine/infrastructure"
 	"github.com/cryling/gender-engine/middleware"
@@ -16,9 +14,6 @@ import (
 )
 
 func main() {
-	ginEnv := flag.String("environment", "development", "Specify if running in 'development' or 'production'")
-	config.Initialize(*ginEnv)
-
 	db, err := sql.Open("sqlite3", "./data.db")
 	if err != nil {
 		log.Fatalf("Failed to open database: %v", err)

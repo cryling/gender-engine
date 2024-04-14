@@ -1,8 +1,9 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
+	"os"
+	"strconv"
 	"sync"
 	"time"
 
@@ -26,10 +27,6 @@ var (
 
 // init starts the cleanup goroutine.
 func init() {
-	log.Println("Starting cleanup goroutine")
-	log.Println("cleanupInterval: ", cleanupInterval)
-	log.Println("ipTimeout: ", ipTimeout)
-
 	go cleanupRateLimiters()
 }
 
@@ -38,10 +35,19 @@ func getLimiter(ip string) *rate.Limiter {
 	mu.Lock()
 	defer mu.Unlock()
 
+	rateValue, err := strconv.Atoi(os.Getenv("RATE_LIMIT"))
+	if err != nil {
+		rateValue = 50
+	}
+	burstValue, err := strconv.Atoi(os.Getenv("RATE_BURST"))
+	if err != nil {
+		burstValue = 500
+	}
+
 	lim, exists := rateLimiters[ip]
 	if !exists {
 		lim = &ipLimiter{
-			limiter:  rate.NewLimiter(50, 500),
+			limiter:  rate.NewLimiter(rate.Limit(rateValue), burstValue),
 			lastSeen: time.Now(),
 		}
 		rateLimiters[ip] = lim

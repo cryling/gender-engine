@@ -26,6 +26,8 @@ go.work
 .
 /tmp
 *.csv
+*.db
+gender-engine
 
 # mac hidden files
 .DS_Store

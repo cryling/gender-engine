@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func InitializeCSV(filePath string) map[string]string {
+func InitializeCSV(filePath string) *map[string]string {
 	f, err := os.Open(filePath)
 	if err != nil {
 		log.Fatal("Unable to read input file "+filePath, err)
@@ -37,7 +37,7 @@ func createColumnMap(header []string) map[string]int {
 	return columnMap
 }
 
-func createGenderMap(reader *csv.Reader, columnMap map[string]int) map[string]string {
+func createGenderMap(reader *csv.Reader, columnMap map[string]int) *map[string]string {
 	data := make(map[string]string)
 
 	for {
@@ -54,5 +54,5 @@ func createGenderMap(reader *csv.Reader, columnMap map[string]int) map[string]st
 		data[name] = gender
 	}
 
-	return data
+	return &data
 }

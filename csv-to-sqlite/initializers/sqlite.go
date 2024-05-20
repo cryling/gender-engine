@@ -56,7 +56,7 @@ func createTable(db *sql.DB) {
 
 func createIndex(db *sql.DB) {
 	log.Println("Creating index if not exists")
-	createIndexSQL := `CREATE INDEX IF NOT EXISTS idx_gender_labels_name ON gender_labels (name, country);`
+	createIndexSQL := `CREATE INDEX IF NOT EXISTS idx_gender_labels_name ON gender_labels (name, country, probability);`
 	_, err := db.Exec(createIndexSQL)
 	if err != nil {
 		log.Fatal(err)

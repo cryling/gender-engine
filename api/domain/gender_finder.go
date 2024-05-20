@@ -13,5 +13,8 @@ func NewGenderFinder(repo GenderLabelRepository, name string, country string) Ge
 }
 
 func (finder GenderFinder) Find() (*GenderLabel, error) {
-	return finder.Repo.FindByNameAndCountry(strings.ToLower(finder.Name), finder.Country)
+	return finder.Repo.FindByNameAndCountry(
+		strings.ToLower(finder.Name),
+		strings.ToUpper(finder.Country),
+	)
 }

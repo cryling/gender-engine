@@ -28,7 +28,7 @@ func main() {
 	r.ForwardedByClientIP = true
 	r.Use(middleware.RateLimitMiddleware())
 
-	r.GET("/api/v1/sqlite_gender", func(c *gin.Context) {
+	r.GET("/api/v1/gender", func(c *gin.Context) {
 		name := c.Query("name")
 		country := c.Query("country")
 
@@ -42,7 +42,7 @@ func main() {
 			panic(err)
 		}
 
-		c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("%s could be found", name), "gender": &result})
+		c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("%s could be found", name), "result": &result})
 	})
 
 	r.Run()

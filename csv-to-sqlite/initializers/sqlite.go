@@ -6,14 +6,9 @@ import (
 	"log"
 )
 
-func InitializeSqlite(ctx context.Context, db *sql.DB, data map[string]string) {
+func InitializeSqlite(ctx context.Context, db *sql.DB, data []GenderData) {
 	createTable(db)
 	createIndex(db)
-
-	if alreadySetUp(db) {
-		log.Println("Database already set up")
-		return
-	}
 
 	tx, err := db.Begin()
 	if err != nil {
@@ -21,15 +16,15 @@ func InitializeSqlite(ctx context.Context, db *sql.DB, data map[string]string) {
 	}
 
 	// Prepare a statement for inserting data
-	stmt, err := tx.Prepare("INSERT INTO gender_labels(name, gender) VALUES (?, ?)")
+	stmt, err := tx.Prepare("INSERT INTO gender_labels(name, gender, country, probability) VALUES (?, ?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer stmt.Close()
 
-	// Iterate over the hashmap and insert each item
-	for name, gender := range data {
-		_, err = stmt.Exec(name, gender)
+	// Iterate over the list and insert each item
+	for _, element := range data {
+		_, err = stmt.Exec(element.Name, element.Gender, element.Code, element.Probability)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -48,7 +43,9 @@ func createTable(db *sql.DB) {
 	createTableSQL := `CREATE TABLE IF NOT EXISTS gender_labels (
 		"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,     
 		"name" TEXT,
-		"gender" TEXT
+		"country" TEXT,
+		"gender" TEXT,
+		"probability" REAL
 	);`
 
 	_, err := db.Exec(createTableSQL)
@@ -59,19 +56,9 @@ func createTable(db *sql.DB) {
 
 func createIndex(db *sql.DB) {
 	log.Println("Creating index if not exists")
-	createIndexSQL := `CREATE INDEX IF NOT EXISTS idx_gender_labels_name ON gender_labels (name);`
+	createIndexSQL := `CREATE INDEX IF NOT EXISTS idx_gender_labels_name ON gender_labels (name, country);`
 	_, err := db.Exec(createIndexSQL)
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func alreadySetUp(db *sql.DB) bool {
-	var count int
-	err := db.QueryRow("SELECT COUNT(*) FROM gender_labels").Scan(&count)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return (count == 3491141)
 }

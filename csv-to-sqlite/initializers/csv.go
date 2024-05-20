@@ -7,7 +7,14 @@ import (
 	"os"
 )
 
-func InitializeCSV(filePath string) *map[string]string {
+type GenderData struct {
+	Name        string
+	Gender      string
+	Code        string
+	Probability string
+}
+
+func InitializeCSV(filePath string) *[]GenderData {
 	f, err := os.Open(filePath)
 	if err != nil {
 		log.Fatal("Unable to read input file "+filePath, err)
@@ -37,8 +44,8 @@ func createColumnMap(header []string) map[string]int {
 	return columnMap
 }
 
-func createGenderMap(reader *csv.Reader, columnMap map[string]int) *map[string]string {
-	data := make(map[string]string)
+func createGenderMap(reader *csv.Reader, columnMap map[string]int) *[]GenderData {
+	data := make([]GenderData, 0)
 
 	for {
 		row, err := reader.Read()
@@ -49,9 +56,12 @@ func createGenderMap(reader *csv.Reader, columnMap map[string]int) *map[string]s
 			log.Fatalf("Failed to read row: %v", err)
 		}
 
-		name := row[columnMap["name"]]
-		gender := row[columnMap["gender"]]
-		data[name] = gender
+		data = append(data, GenderData{
+			Name:        row[columnMap["name"]],
+			Gender:      row[columnMap["gender"]],
+			Code:        row[columnMap["code"]],
+			Probability: row[columnMap["wgt"]],
+		})
 	}
 
 	return &data

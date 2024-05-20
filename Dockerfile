@@ -1,31 +1,29 @@
-FROM golang:alpine3.18 AS build
+# Stage 1: Build the CSV to SQLite converter
+FROM golang:1.22.2 as builder
+WORKDIR /app/csv-to-sqlite
+COPY csv-to-sqlite/ .
+RUN go mod tidy
+RUN go build -o /csv-to-sqlite
 
-# Important:
-# Because this is a CGO enabled package, you are required to set it as 1.
-ENV CGO_ENABLED=1
+# Run the CSV to SQLite converter
+RUN /csv-to-sqlite
 
-RUN apk add --no-cache \
-    # Important: required for go-sqlite3
-    gcc \
-    # Required for Alpine
-    musl-dev
+# Stage 2: Build the Gin app
+FROM golang:1.22.2 as gin-builder
+WORKDIR /app/api
+COPY api/ .
+RUN go mod tidy
+RUN go build -o /api
 
-WORKDIR /app
-
-COPY . .
-
-RUN go mod download
-RUN go build -o /app/gender-engine
-
-FROM alpine:latest
-
-WORKDIR /app
-COPY --from=build /app/gender-engine .
-COPY --from=build /app/data.db .
+# Stage 3: Create the final image
+FROM debian:bookworm-slim
+WORKDIR /root/
+COPY --from=gin-builder /api .
+COPY --from=builder /app/csv-to-sqlite/data/data.db ./data.db
 
 ENV GIN_MODE=release
 ENV RATE_LIMIT=50
 ENV RATE_BURST=500
 
 EXPOSE 8080
-CMD ["./gender-engine"]
+CMD ["./api"]

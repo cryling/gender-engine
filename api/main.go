@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/cryling/gender-engine/api/domain"
 	"github.com/cryling/gender-engine/api/infrastructure"
@@ -26,7 +27,10 @@ func main() {
 
 	r := gin.Default()
 	r.ForwardedByClientIP = true
-	r.Use(middleware.RateLimitMiddleware())
+
+	if os.Getenv("RATE_LIMIT_ENABLED") == "true" {
+		r.Use(middleware.RateLimitMiddleware())
+	}
 
 	r.GET("/api/v1/gender", func(c *gin.Context) {
 		name := c.Query("name")
@@ -34,9 +38,19 @@ func main() {
 
 		genderFinder := domain.NewGenderFinder(genderLabelRepo, name, country)
 
+		if genderFinder.Name == "" {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Name is required"})
+			return
+		}
+
+		if !domain.ValidCountryCodes()[genderFinder.Country] {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid country code"})
+			return
+		}
+
 		result, err := genderFinder.Find()
 		if _, ok := err.(*domain.NotFoundError); ok {
-			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": err})
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": err.Error()})
 			return
 		} else if err != nil {
 			panic(err)

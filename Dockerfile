@@ -36,6 +36,7 @@ COPY --from=csv-to-sqlite-builder /app/csv-to-sqlite/data/data.db ./data.db
 RUN apk add --no-cache libc6-compat
 
 ENV GIN_MODE=release
+ENV RATE_LIMIT_ENABLED=true
 ENV RATE_LIMIT=50
 ENV RATE_BURST=500
 

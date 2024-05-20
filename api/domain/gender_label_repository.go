@@ -1,5 +1,5 @@
 package domain
 
 type GenderLabelRepository interface {
-	FindByName(name string) (*GenderLabel, error)
+	FindByNameAndCountry(name string, country string) (*GenderLabel, error)
 }

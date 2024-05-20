@@ -16,13 +16,13 @@ func NewGenderLabelStorage(db *sql.DB) *GenderLabelStorage {
 	return &GenderLabelStorage{DB: db}
 }
 
-func (handler *GenderLabelStorage) FindByName(name string) (*domain.GenderLabel, error) {
-	row := handler.DB.QueryRow("SELECT * FROM gender_labels WHERE name = ? LIMIT 1", name)
+func (handler *GenderLabelStorage) FindByNameAndCountry(name string, country string) (*domain.GenderLabel, error) {
+	row := handler.DB.QueryRow("SELECT * FROM gender_labels WHERE name = ? AND country = ? LIMIT 1", name, country)
 
 	label := domain.GenderLabel{}
 
 	var id int
-	err := row.Scan(&id, &label.Name, &label.Gender)
+	err := row.Scan(&id, &label.Name, &label.Gender, &label.Country, &label.Probability)
 
 	if err != nil {
 		switch err {

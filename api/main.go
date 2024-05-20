@@ -30,8 +30,9 @@ func main() {
 
 	r.GET("/api/v1/sqlite_gender", func(c *gin.Context) {
 		name := c.Query("name")
+		country := c.Query("country")
 
-		genderFinder := domain.NewGenderFinder(genderLabelRepo, name)
+		genderFinder := domain.NewGenderFinder(genderLabelRepo, name, country)
 
 		result, err := genderFinder.Find()
 		if _, ok := err.(*domain.NotFoundError); ok {

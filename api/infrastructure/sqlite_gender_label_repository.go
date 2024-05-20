@@ -2,7 +2,6 @@ package infrastructure
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 
 	"github.com/cryling/gender-engine/api/domain"
@@ -18,8 +17,6 @@ func NewGenderLabelStorage(db *sql.DB) *GenderLabelStorage {
 }
 
 func (handler *GenderLabelStorage) FindByNameAndCountry(name string, country string) (*domain.GenderLabel, error) {
-	fmt.Println(name, country)
-
 	row := handler.DB.QueryRow(
 		"SELECT * FROM gender_labels WHERE name = ? AND country = ? ORDER BY probability DESC LIMIT 1",
 		name,
@@ -32,7 +29,6 @@ func (handler *GenderLabelStorage) FindByNameAndCountry(name string, country str
 	err := row.Scan(&id, &label.Name, &label.Gender, &label.Country, &label.Probability)
 
 	if err != nil {
-		fmt.Println(err)
 		switch err {
 		case sql.ErrNoRows:
 			log.Printf("Name not found")

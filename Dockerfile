@@ -29,6 +29,7 @@ RUN go build -o /api
 
 # Stage 3: Create the final image
 FROM alpine:latest
+LABEL org.opencontainers.image.source=https://github.com/cryling/gender-engine
 WORKDIR /root/
 COPY --from=gin-builder /api .
 COPY --from=csv-to-sqlite-builder /app/csv-to-sqlite/data/data.db ./data.db

@@ -6,12 +6,28 @@ You can check out a demo on gender-engine.kianreiling.com.
 
 ## Getting Started
 
-### Prerequisites
+### Docker Image
+
+If you want to use the pre-built Docker image, you can pull it from the GitHub Container Registry.
+
+```sh
+docker pull ghcr.io/cryling/gender-engine:latest
+```
+
+Then run it with:
+
+```sh
+docker run -it --rm -p 8080:8080 ghcr.io/cryling/gender-engine
+```
+
+### Building from Source
+
+#### Prerequisites
 
 - Docker
 - The WGND 2.0 dataset from Harvard Dataverse. You can find the dataset under the [DOI: 10.7910/DVN/MSEGSJ](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/MSEGSJ). This project uses name-country pairs, so you need to download the CSV named wgnd_2_0_name-gender-code.
 
-### Installation
+#### Installation
 
 1. Download the appropriate dataset from the Harvard Dataverse. Ensure you download the wgnd_2_0_name-gender-code.csv file.
 
@@ -19,21 +35,21 @@ You can check out a demo on gender-engine.kianreiling.com.
 
 3. Build the Docker Image
 
-```sh
-docker build --tag gender-engine .
-```
+   ```sh
+   docker build --tag gender-engine .
+   ```
 
-If you want to provide the file path as an argument, run:
+   If you want to provide the file path as an argument, run:
 
-```sh
-docker build --tag gender-engine --build-arg CSV_FILE_PATH=$YOUR_FILE_PATH .
-```
+   ```sh
+   docker build --tag gender-engine --build-arg CSV_FILE_PATH=$YOUR_FILE_PATH .
+   ```
 
 4. Run the Docker Container.
 
-```sh
-docker run -it --rm -p 8080:8080 gender-engine
-```
+   ```sh
+   docker run -it --rm -p 8080:8080 gender-engine
+   ```
 
 ## Configuration
 

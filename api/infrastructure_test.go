@@ -19,7 +19,9 @@ func setupTestDB(t *testing.T) *sql.DB {
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS gender_labels (
 		id INTEGER PRIMARY KEY,
 		name TEXT NOT NULL,
-		gender TEXT NOT NULL
+		gender TEXT NOT NULL,
+		country TEXT NOT NULL,
+		probability REAL NOT NULL
 	)`)
 	if err != nil {
 		t.Fatalf("Failed to create table: %v", err)
@@ -29,9 +31,9 @@ func setupTestDB(t *testing.T) *sql.DB {
 }
 
 func seedGenderLabels(db *sql.DB) {
-	_, err := db.Exec(`INSERT INTO gender_labels (name, gender) VALUES
-		('Sam', 'M'),
-		('Jordan', 'F')`)
+	_, err := db.Exec(`INSERT INTO gender_labels (name, gender, country, probability) VALUES
+		('Sam', 'M', 'US', 0.9),
+		('Jordan', 'F', 'US', 0.8)`)
 	if err != nil {
 		log.Fatalf("Failed to seed gender labels: %v", err)
 	}
@@ -46,17 +48,18 @@ func TestFindByName(t *testing.T) {
 
 	tests := []struct {
 		name           string
+		country        string
 		expectedGender string
 		expectError    bool
 	}{
-		{"Sam", "M", false},
-		{"Jordan", "F", false},
-		{"Unknown", "", true},
+		{"Sam", "US", "M", false},
+		{"Jordan", "US", "F", false},
+		{"Unknown", "US", "", true},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			label, err := storage.FindByName(test.name)
+			label, err := storage.FindByNameAndCountry(test.name, test.country)
 			if test.expectError {
 				if err == nil {
 					t.Errorf("Expected an error for %v, got nil", test.name)

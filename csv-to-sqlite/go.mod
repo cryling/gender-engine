@@ -2,4 +2,4 @@ module github.com/cryling/gender-engine/csv-to-sqlite
 
 go 1.22.2
 
-require github.com/mattn/go-sqlite3 v1.14.17
+require github.com/mattn/go-sqlite3 v1.14.22

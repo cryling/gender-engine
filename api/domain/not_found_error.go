@@ -5,5 +5,5 @@ type NotFoundError struct {
 }
 
 func (e *NotFoundError) Error() string {
-	return e.Name + " not found"
+	return e.Name + " could not be found"
 }

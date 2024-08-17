@@ -8,8 +8,8 @@ type GenderFinder struct {
 	Country string
 }
 
-func NewGenderFinder(repo GenderLabelRepository, name string, country string) GenderFinder {
-	return GenderFinder{Repo: repo, Name: name, Country: country}
+func NewGenderFinder(repo GenderLabelRepository, name string, country string) *GenderFinder {
+	return &GenderFinder{Repo: repo, Name: name, Country: country}
 }
 
 func (finder GenderFinder) FindByNameAndCountry() (*GenderCountryLabel, error) {

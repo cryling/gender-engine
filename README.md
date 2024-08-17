@@ -25,13 +25,13 @@ docker run -it --rm -p 8080:8080 ghcr.io/cryling/gender-engine
 #### Prerequisites
 
 - Docker
-- The WGND 2.0 dataset from Harvard Dataverse. You can find the dataset under the [DOI: 10.7910/DVN/MSEGSJ](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/MSEGSJ). This project uses name-country pairs, so you need to download the CSV named wgnd_2_0_name-gender-code.
+- The WGND 2.0 dataset from Harvard Dataverse. You can find the dataset under the [DOI: 10.7910/DVN/MSEGSJ](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/MSEGSJ). This project uses the wgnd_2_0_name-gender-code.csv and the wgnd_2_0_name-gender.csv.
 
 #### Installation
 
-1. Download the appropriate dataset from the Harvard Dataverse. Ensure you download the wgnd_2_0_name-gender-code.csv file.
+1. Download the appropriate dataset from the Harvard Dataverse. Ensure you download the wgnd_2_0_name-gender-code.csv and the wgnd_2_0_name-gender.csv file.
 
-2. Copy the CSV file into the root data folder of this project. Alternatively, you can provide the file path to the CSV as a build argument when building the Docker image.
+2. Copy the CSV files into the root data folder of this project. Alternatively, you can provide the file path to the CSV files as a build argument when building the Docker image.
 
 3. Build the Docker Image
 
@@ -42,7 +42,7 @@ docker run -it --rm -p 8080:8080 ghcr.io/cryling/gender-engine
    If you want to provide the file path as an argument, run:
 
    ```sh
-   docker build --tag gender-engine --build-arg CSV_FILE_PATH=$YOUR_FILE_PATH .
+   docker build --tag gender-engine --build-arg GENDER_CODE_CSV_PATH=$YOUR_GENDER_CODE_FILE_PATH GENDER_CSV_PATH=$YOUR_GENDER_FILE_PATH .
    ```
 
 4. Run the Docker Container.

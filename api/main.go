@@ -43,12 +43,26 @@ func main() {
 			return
 		}
 
+		if country == "" {
+			result, err := genderFinder.FindByName()
+			if _, ok := err.(*domain.NotFoundError); ok {
+				c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+				return
+			} else if err != nil {
+				panic(err)
+			}
+
+			c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("%s could be found", name), "result": &result})
+			return
+
+		}
+
 		if !domain.ValidCountryCodes()[genderFinder.Country] {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid country code"})
 			return
 		}
 
-		result, err := genderFinder.Find()
+		result, err := genderFinder.FindByNameAndCountry()
 		if _, ok := err.(*domain.NotFoundError); ok {
 			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": err.Error()})
 			return

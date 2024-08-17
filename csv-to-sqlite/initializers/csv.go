@@ -7,17 +7,30 @@ import (
 	"os"
 )
 
-type GenderData struct {
+type GenderCountryData struct {
 	Name        string
 	Gender      string
 	Code        string
 	Probability string
 }
 
-func InitializeCSV(filePath string) *[]GenderData {
+type GenderData struct {
+	Name   string
+	Gender string
+}
+
+func InitializeGenderCountryCSV(filePath string) *[]GenderCountryData {
+	return parseCSV(filePath, createGenderCountryMap)
+}
+
+func InitializeGenderCSV(filePath string) *[]GenderData {
+	return parseCSV(filePath, createGenderMap)
+}
+
+func parseCSV[T any](filePath string, parseFn func(*csv.Reader, map[string]int) *[]T) *[]T {
 	f, err := os.Open(filePath)
 	if err != nil {
-		log.Fatal("Unable to read input file "+filePath, err)
+		log.Fatalf("Unable to read input file %s: %v", filePath, err)
 	}
 	defer f.Close()
 
@@ -29,11 +42,7 @@ func InitializeCSV(filePath string) *[]GenderData {
 	}
 
 	columnMap := createColumnMap(header)
-	data := createGenderMap(reader, columnMap)
-
-	log.Println("CSV initialized")
-
-	return data
+	return parseFn(reader, columnMap)
 }
 
 func createColumnMap(header []string) map[string]int {
@@ -44,23 +53,44 @@ func createColumnMap(header []string) map[string]int {
 	return columnMap
 }
 
+func createGenderCountryMap(reader *csv.Reader, columnMap map[string]int) *[]GenderCountryData {
+	data := make([]GenderCountryData, 0)
+
+	for {
+		row, err := reader.Read()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			log.Fatalf("Failed to read row: %v", err)
+		}
+
+		data = append(data, GenderCountryData{
+			Name:        row[columnMap["name"]],
+			Gender:      row[columnMap["gender"]],
+			Code:        row[columnMap["code"]],
+			Probability: row[columnMap["wgt"]],
+		})
+	}
+
+	return &data
+}
+
 func createGenderMap(reader *csv.Reader, columnMap map[string]int) *[]GenderData {
 	data := make([]GenderData, 0)
 
 	for {
 		row, err := reader.Read()
 		if err != nil {
-			if err == csv.ErrFieldCount || err == io.EOF {
+			if err == io.EOF {
 				break
 			}
 			log.Fatalf("Failed to read row: %v", err)
 		}
 
 		data = append(data, GenderData{
-			Name:        row[columnMap["name"]],
-			Gender:      row[columnMap["gender"]],
-			Code:        row[columnMap["code"]],
-			Probability: row[columnMap["wgt"]],
+			Name:   row[columnMap["name"]],
+			Gender: row[columnMap["gender"]],
 		})
 	}
 

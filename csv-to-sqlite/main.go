@@ -18,6 +18,10 @@ func main() {
 	}
 	defer db.Close()
 
-	data := initializers.InitializeCSV("data/data.csv")
-	initializers.InitializeSqlite(ctx, db, *data)
+	genderCSV := initializers.InitializeGenderCSV("data/wgnd_2_0_name-gender.csv")
+	genderCountryCSV := initializers.InitializeGenderCountryCSV("data/wgnd_2_0_name-gender-code.csv")
+
+	initializers.InitializeSqlite(ctx, db)
+	initializers.InitializeGender(ctx, db, *genderCSV)
+	initializers.InitializeGenderCountry(ctx, db, *genderCountryCSV)
 }

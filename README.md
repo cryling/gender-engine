@@ -88,7 +88,7 @@ curl -X GET "http://localhost:8080/api/v1/gender?name=tom&country=US"
 
 ```json
 {
-  "message": "Tom could be found",
+  "message": "Tom could be found in US",
   "result": {
     "Name": "tom",
     "Gender": "M",
@@ -102,7 +102,7 @@ If the name could not be found, the response would look like this:
 
 ```json
 {
-  "message": "Tom not found"
+  "message": "Tom could not be found"
 }
 ```
 

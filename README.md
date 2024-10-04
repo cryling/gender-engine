@@ -1,6 +1,6 @@
 # gender-engine
 
-This project provides an easy-to-use API for the World Gender Name Dictionary (WGND 2.0).
+This project provides an easy-to-use API for the [World Gender Name Dictionary (WGND 2.0)](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/MSEGSJ).
 
 You can check out a demo on gender-engine.kianreiling.com.
 
@@ -25,11 +25,11 @@ docker run -it --rm -p 8080:8080 ghcr.io/cryling/gender-engine
 #### Prerequisites
 
 - Docker
-- The WGND 2.0 dataset from Harvard Dataverse. You can find the dataset under the [DOI: 10.7910/DVN/MSEGSJ](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/MSEGSJ). This project uses the wgnd_2_0_name-gender-code.csv and the wgnd_2_0_name-gender.csv.
+- The WGND 2.0 dataset from Harvard Dataverse. You can find the dataset under the [DOI: 10.7910/DVN/MSEGSJ](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/MSEGSJ). This project uses the `wgnd_2_0_name-gender-code.csv` and the `wgnd_2_0_name-gender.csv`.
 
 #### Installation
 
-1. Download the appropriate dataset from the Harvard Dataverse. Ensure you download the wgnd_2_0_name-gender-code.csv and the wgnd_2_0_name-gender.csv file.
+1. Download the appropriate dataset from the Harvard Dataverse. Ensure you download the `wgnd_2_0_name-gender-code.csv` and the `wgnd_2_0_name-gender.csv` file.
 
 2. Copy the CSV files into the root data folder of this project. Alternatively, you can provide the file path to the CSV files as a build argument when building the Docker image.
 

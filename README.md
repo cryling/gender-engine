@@ -2,8 +2,6 @@
 
 This project provides an easy-to-use API for the [World Gender Name Dictionary (WGND 2.0)](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/MSEGSJ).
 
-You can check out a demo on gender-engine.kianreiling.com.
-
 ## Getting Started
 
 ### Docker Image

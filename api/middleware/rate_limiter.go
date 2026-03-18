@@ -1,13 +1,14 @@
 package middleware
 
 import (
+	"encoding/json"
+	"net"
 	"net/http"
 	"os"
 	"strconv"
 	"sync"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"golang.org/x/time/rate"
 )
 
@@ -23,10 +24,25 @@ var (
 	cleanupInterval = time.Minute * 5
 	// ipTimeout defines how long to keep an IP in memory since last seen.
 	ipTimeout = time.Hour
+
+	rateEnabled bool
+	rateValue   int
+	burstValue  int
 )
 
-// init starts the cleanup goroutine.
 func init() {
+	rateEnabled = os.Getenv("RATE_LIMIT_ENABLED") == "true"
+
+	rateValue = 50
+	if v, err := strconv.Atoi(os.Getenv("RATE_LIMIT")); err == nil {
+		rateValue = v
+	}
+
+	burstValue = 500
+	if v, err := strconv.Atoi(os.Getenv("RATE_BURST")); err == nil {
+		burstValue = v
+	}
+
 	go cleanupRateLimiters()
 }
 
@@ -34,15 +50,6 @@ func init() {
 func getLimiter(ip string) *rate.Limiter {
 	mu.Lock()
 	defer mu.Unlock()
-
-	rateValue, err := strconv.Atoi(os.Getenv("RATE_LIMIT"))
-	if err != nil {
-		rateValue = 50
-	}
-	burstValue, err := strconv.Atoi(os.Getenv("RATE_BURST"))
-	if err != nil {
-		burstValue = 500
-	}
 
 	lim, exists := rateLimiters[ip]
 	if !exists {
@@ -52,7 +59,6 @@ func getLimiter(ip string) *rate.Limiter {
 		}
 		rateLimiters[ip] = lim
 	} else {
-		// Update lastSeen time.
 		lim.lastSeen = time.Now()
 	}
 
@@ -73,16 +79,37 @@ func cleanupRateLimiters() {
 	}
 }
 
-// RateLimitMiddleware checks if the requester has exceeded their rate limit.
-func RateLimitMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		limiter := getLimiter(c.ClientIP())
+// clientIP extracts the client IP from the request.
+func clientIP(r *http.Request) string {
+	if forwarded := r.Header.Get("X-Forwarded-For"); forwarded != "" {
+		return forwarded
+	}
+	if realIP := r.Header.Get("X-Real-IP"); realIP != "" {
+		return realIP
+	}
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		return r.RemoteAddr
+	}
+	return host
+}
+
+// RateLimitMiddleware wraps an http.Handler with per-IP rate limiting.
+func RateLimitMiddleware(next http.Handler) http.Handler {
+	if !rateEnabled {
+		return next
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		limiter := getLimiter(clientIP(r))
 
 		if !limiter.Allow() {
-			c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{"error": "Rate limit exceeded"})
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusTooManyRequests)
+			json.NewEncoder(w).Encode(map[string]string{"error": "Rate limit exceeded"})
 			return
 		}
 
-		c.Next()
-	}
+		next.ServeHTTP(w, r)
+	})
 }

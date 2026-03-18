@@ -18,24 +18,20 @@ func NewGenderLabelStorage(db *sql.DB) *GenderLabelStorage {
 
 func (handler *GenderLabelStorage) FindByNameAndCountry(name string, country string) (*domain.GenderCountryLabel, error) {
 	row := handler.DB.QueryRow(
-		"SELECT * FROM gender_country_labels WHERE name = ? AND country = ? ORDER BY probability DESC LIMIT 1",
+		"SELECT name, gender, country, probability FROM gender_country_labels WHERE name = ? AND country = ? ORDER BY probability DESC LIMIT 1",
 		name,
 		country,
 	)
 
 	label := domain.GenderCountryLabel{}
-
-	var id int
-	err := row.Scan(&id, &label.Name, &label.Gender, &label.Country, &label.Probability)
+	err := row.Scan(&label.Name, &label.Gender, &label.Country, &label.Probability)
 
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			log.Printf("Name not found")
-		default:
-			log.Println("Unexpected error: ", err)
+		if err == sql.ErrNoRows {
+			return nil, &domain.NotFoundError{Name: name}
 		}
-		return &domain.GenderCountryLabel{}, &domain.NotFoundError{Name: name}
+		log.Printf("Unexpected error querying gender_country_labels for %s: %v", name, err)
+		return nil, err
 	}
 
 	return &label, nil
@@ -43,23 +39,19 @@ func (handler *GenderLabelStorage) FindByNameAndCountry(name string, country str
 
 func (handler *GenderLabelStorage) FindByName(name string) (*domain.GenderLabel, error) {
 	row := handler.DB.QueryRow(
-		"SELECT * FROM gender_labels WHERE name = ?",
+		"SELECT name, gender FROM gender_labels WHERE name = ?",
 		name,
 	)
 
 	label := domain.GenderLabel{}
-
-	var id int
-	err := row.Scan(&id, &label.Name, &label.Gender)
+	err := row.Scan(&label.Name, &label.Gender)
 
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			log.Printf("Name not found")
-		default:
-			log.Println("Unexpected error: ", err)
+		if err == sql.ErrNoRows {
+			return nil, &domain.NotFoundError{Name: name}
 		}
-		return &domain.GenderLabel{}, &domain.NotFoundError{Name: name}
+		log.Printf("Unexpected error querying gender_labels for %s: %v", name, err)
+		return nil, err
 	}
 
 	return &label, nil

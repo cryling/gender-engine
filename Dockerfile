@@ -9,12 +9,14 @@ RUN apk add --no-cache \
 
 
 FROM builder AS csv-to-sqlite-builder
+RUN apk add --no-cache curl
 WORKDIR /app/csv-to-sqlite
 COPY csv-to-sqlite/ .
-ARG GENDER_CODE_CSV_PATH=data/wgnd_2_0_name-gender-code.csv
-COPY $GENDER_CODE_CSV_PATH /app/csv-to-sqlite/data/wgnd_2_0_name-gender-code.csv
-ARG GENDER_CSV_PATH=data/wgnd_2_0_name-gender.csv
-COPY $GENDER_CSV_PATH /app/csv-to-sqlite/data/wgnd_2_0_name-gender.csv
+RUN mkdir -p data && \
+    curl -L -o data/wgnd_2_0_name-gender-code.csv \
+      "https://dataverse.harvard.edu/api/access/datafile/4750348?format=original" && \
+    curl -L -o data/wgnd_2_0_name-gender.csv \
+      "https://dataverse.harvard.edu/api/access/datafile/4750351?format=original"
 RUN go mod tidy
 RUN go build -o /csv-to-sqlite
 

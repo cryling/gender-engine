@@ -23,8 +23,8 @@ RUN go build -o /csv-to-sqlite
 # Run the CSV to SQLite converter
 RUN /csv-to-sqlite
 
-# Stage 2: Build the Gin app
-FROM builder AS gin-builder
+# Stage 2: Build the API
+FROM builder AS api-builder
 WORKDIR /app/api
 COPY api/ .
 ENV CGO_ENABLED=1
@@ -35,7 +35,7 @@ RUN go build -o /api
 FROM alpine:3.21
 LABEL org.opencontainers.image.source=https://github.com/cryling/gender-engine
 WORKDIR /root/
-COPY --from=gin-builder /api .
+COPY --from=api-builder /api .
 COPY --from=csv-to-sqlite-builder /app/csv-to-sqlite/data/data.db ./data.db
 
 RUN apk add --no-cache libc6-compat

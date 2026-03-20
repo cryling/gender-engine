@@ -24,7 +24,7 @@ func main() {
 
 	handler := middleware.CORSMiddleware(middleware.RateLimitMiddleware(mux))
 
-	log.Println("Server starting on :8080")
+	fmt.Println("Server starting on :8080")
 	if err := http.ListenAndServe(":8080", handler); err != nil {
 		log.Fatalf("Failed to run the server: %v", err)
 	}
@@ -35,7 +35,7 @@ func setupDatabase(dbPath string) *sql.DB {
 	if err != nil {
 		log.Fatalf("Failed to open database: %v", err)
 	}
-	log.Println("Database connection established")
+	fmt.Println("Database connection established")
 	return db
 }
 
@@ -99,7 +99,7 @@ func handleError(w http.ResponseWriter, err error, name string) {
 	if _, ok := err.(*domain.NotFoundError); ok {
 		writeJSON(w, http.StatusNotFound, map[string]string{"message": err.Error()})
 	} else {
-		log.Printf("An error occurred while processing the request for %s: %v", name, err)
+		log.Printf("An error occurred while processing the request: %v", err)
 		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "Internal server error"})
 	}
 }

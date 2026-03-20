@@ -30,7 +30,7 @@ func (handler *GenderLabelStorage) FindByNameAndCountry(name string, country str
 		if err == sql.ErrNoRows {
 			return nil, &domain.NotFoundError{Name: name}
 		}
-		log.Printf("Unexpected error querying gender_country_labels for %s: %v", name, err)
+		log.Printf("Unexpected error querying gender_country_labels: %v", err)
 		return nil, err
 	}
 
@@ -50,7 +50,7 @@ func (handler *GenderLabelStorage) FindByName(name string) (*domain.GenderLabel,
 		if err == sql.ErrNoRows {
 			return nil, &domain.NotFoundError{Name: name}
 		}
-		log.Printf("Unexpected error querying gender_labels for %s: %v", name, err)
+		log.Printf("Unexpected error querying gender_labels: %v", err)
 		return nil, err
 	}
 

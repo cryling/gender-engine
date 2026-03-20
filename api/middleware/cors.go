@@ -2,7 +2,6 @@ package middleware
 
 import "net/http"
 
-// CORSMiddleware adds CORS headers to allow browser-based requests from any origin.
 func CORSMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")

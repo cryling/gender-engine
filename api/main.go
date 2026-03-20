@@ -22,7 +22,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/gender", handleGenderRequest(genderLabelRepo))
 
-	handler := middleware.RateLimitMiddleware(mux)
+	handler := middleware.CORSMiddleware(middleware.RateLimitMiddleware(mux))
 
 	log.Println("Server starting on :8080")
 	if err := http.ListenAndServe(":8080", handler); err != nil {

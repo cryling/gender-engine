@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"runtime"
 
 	"github.com/cryling/gender-engine/api/domain"
 	"github.com/cryling/gender-engine/api/infrastructure"
@@ -31,10 +32,18 @@ func main() {
 }
 
 func setupDatabase(dbPath string) *sql.DB {
-	db, err := sql.Open("sqlite3", dbPath)
+	// WAL allows concurrent readers; synchronous=NORMAL is safe with WAL and
+	// reduces fsync overhead. cache_size is capped at 4 MB to stay within the
+	// memory budget of the deployment target (1 vCPU, 512 MB RAM).
+	dsn := "file:" + dbPath + "?_journal_mode=WAL&_synchronous=NORMAL&_cache_size=-4096"
+	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		log.Fatalf("Failed to open database: %v", err)
 	}
+	numCPU := runtime.NumCPU()
+	db.SetMaxOpenConns(numCPU * 2)
+	db.SetMaxIdleConns(numCPU * 2)
+	db.SetConnMaxLifetime(0)
 	fmt.Println("Database connection established")
 	return db
 }

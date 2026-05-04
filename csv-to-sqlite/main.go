@@ -12,7 +12,7 @@ import (
 func main() {
 	ctx := context.Background()
 
-	db, err := sql.Open("sqlite3", "./data/data.db")
+	db, err := sql.Open("sqlite", "./data/data.db")
 	if err != nil {
 		log.Fatalf("Failed to open database: %v", err)
 	}

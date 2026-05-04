@@ -1,11 +1,7 @@
 # Stage 1: Build the CSV to SQLite converter
 FROM golang:1.24-alpine3.21 AS builder
-ENV CGO_ENABLED=1
-RUN apk add --no-cache \
-    # Important: required for go-sqlite3
-    gcc \
-    # Required for Alpine
-    musl-dev
+ENV CGO_ENABLED=0
+RUN apk add --no-cache curl
 
 
 FROM builder AS csv-to-sqlite-builder
@@ -27,7 +23,7 @@ RUN /csv-to-sqlite
 FROM builder AS api-builder
 WORKDIR /app/api
 COPY api/ .
-ENV CGO_ENABLED=1
+ENV CGO_ENABLED=0
 RUN go mod tidy
 RUN go build -o /api
 

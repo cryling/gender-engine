@@ -80,16 +80,18 @@ curl -X GET "http://localhost:8080/api/v1/gender?name=tom&country=US"
     "Name": "tom",
     "Gender": "M",
     "Country": "US",
-    "Probability": "0.99560356"
+    "ObservedShare": "0.99560356"
   }
 }
 ```
 
-If the name could not be found, the response would look like this:
+`ObservedShare` is not a probability. It is the share of observations in the dataset in which the name was recorded with the returned gender (i.e. how the name's gender was distributed across all observations). A value of `0.99560356` means that in roughly 99.56% of observations the name was recorded as male.
+
+If the name could not be found, or it is not clearly assignable to a single gender (for example unisex names like `Kim`), the response would look like this:
 
 ```json
 {
-  "message": "Tom could not be found"
+  "message": "Tom could not be found or is not clearly assignable to a single gender"
 }
 ```
 

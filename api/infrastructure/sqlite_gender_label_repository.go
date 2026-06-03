@@ -30,7 +30,7 @@ func (handler *GenderLabelStorage) FindByNameAndCountry(name string, country str
 	row := handler.stmtCountry.QueryRow(name, country)
 
 	label := domain.GenderCountryLabel{}
-	err := row.Scan(&label.Name, &label.Gender, &label.Country, &label.Probability)
+	err := row.Scan(&label.Name, &label.Gender, &label.Country, &label.ObservedShare)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
